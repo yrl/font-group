@@ -17,6 +17,7 @@ react是一款框架：具备自己开发的独立思想（mvc:model view contro
    但是配置webpack是一个相对复杂的工作，我们需要自己安装很多的包，还需要自己写相对复杂的配置文件。。。，如果
    我们有一个插件，基于他可以快速构建一套完整的自动化工程项目结构，那么有助于提高开发效率=》“脚手架”
 
+-----------------------------------------------------------------------------------------------------------------
 
 
    第二课：create-create-app
@@ -66,6 +67,7 @@ react是一款框架：具备自己开发的独立思想（mvc:model view contro
      build:项目需要部署到服务器上，我们先执行 yarn  build ，把项目整体编译打包（完成后
      会在项目中生成一个 build文件夹，这个文件夹中包含了所有编译后的内容，我们把他上传到服务器即可）;而且在服务上进行部署的时候，不需要安装任何模块了
      （因为webpack已经把需要的内容都打包到一个js中了）
+-----------------------------------------------------------------------------------------------------------------
 
      第三课：react脚手架的深入剖析
      create-react-app 脚手架为了让结构目录清晰，把安装的webpack及配置文件都集成在了 react-script模块中，放到了node_modules中
@@ -80,11 +82,111 @@ react是一款框架：具备自己开发的独立思想（mvc:model view contro
        如果当前的项目基于git管理，在执行eject的时候，如果还有没有提交到历史区的内容，需要先提交到历史去，然后在
        eject才可以，否则报错：This git repository has untracked files or uncommitted changes:
       =》再去修改对应的配置项即可
-      
+      一旦暴露后，项目目录中多了两个文件夹
+      config 存放的是webpack的配置文件
+      webpack.config.dev.js 开发环境下的配置项（yarn start）
+      webpack.config.prod.js 生成环境下的配置项 （yarn build）
+      scripts 存放的是可执行脚本的js文件
+       start.js  yarn start 执行的就是这个js
+       build.js  yarn  build 执行的就是这个js
+       package.json中的内容也改了
+
+       【举个栗子：需要配置sass】
+        $cnpm install node-sass
+        $cnpm  install sass-loader
+        sass是开发和生产环境下都需要配置的(具体配置可以看网上的资料)
+
+        
+
+        
+
 
       我们预览项目的时候，也是先基于webpack编译，把编译后的内容放到浏览中运行，
       所以如果项目中使用sass，我们需要修改webpack配置项，在配置项中加入sass的编译工作，这样后期预览项目，首先基于webpack把sass编译
       成css，然后再呈现在页面中
 
+      如果想在运行的时候执行是http或者https协议来运行
+      命令$ set HTTPS=true&&cnpm  run start  开启HTTP协议模式(设置环境变量HTTPS的值)(这里设置的是node环境方面的)
+
+      端口设置 set PORT=63341
+-----------------------------------------------------------------------------------------------------------------
+
+      第4堂课:JSX语法之大括号
+      【渐进是框架】
+      一种最流行的框架设计思想，一般框架中都包含很多内容，这样导致框架的体积过于臃肿，
+      拖慢加载的速度，真实项目中，我们使用一个框架，不一定用到所有功能，此时我们应该把框架的功能进行拆分，用户想用
+      什么，让其自己自由组合即可。
+       全家桶：渐进式框架N多部分的组合
+       vue全家桶:vue-cli/vue-router/vuex/axios(fetch)/vue element(vant)
+       react全家桶：create-react-app/react/react-dom/react-router/redux/react-redux/axios/ant/dva/saga/mobx....
+
+        1:react:react框架的核心部分，提供了component类可以供我们进行组件开发，提供了钩子函数（生命周期函数：所有的生命周期
+        函数都是基于回调函数完成的）
+        2：react-dom ：把jsx语法（react独有的语法）渲染为真实的DOM（能够放到页面中展示的结构都叫真实的DOM）的组件
+        /*
+        ReactDOM.render([jsx],[container],[callbak]):把jsx元素渲染到页面中
+        jsx：react虚拟元素
+        container：容器，我们想把元素放到页面中的哪个容器中
+        callback：当把内容放到页面中呈现触发的回调函数
+        jsx：react独有的语法 javascript+xml（html）
+        和我们之前自己拼接的html字符串类似，都是把html结构代码和js代码
+        或者数据混合在一起了，但是它不是字符串
+        ReactDOM.render(<div>HELLO WORLD</div>)(注意前面的字符不要装双引号);
+        */
+        1：不建议我们把jsx直接渲染到body中，而是放在自己创建一个容器中，一般我们放在一个id的root的div中即可
+        2：在jsx中出现的{}是存放js的，但是要求js代码执行完成有返回结果（js表达式）
+            ->不能直接放一个对象数据类型的值（对象(除了给style赋值)、数组(数组中如果没有对象都是基本值是可以的)、函数都不行）
+            ->可以是基本类型的值（布尔类型什么都不显示、null,undefined也是jsx元素，代表的是空）
+            ->循环判断的语句都不支持，但是支持三元运算符
+        例1：
+        let data="总裁";
+        ReactDOM.render(<div id="box">你好{data}</div>,document.getElementById("root"),() => {
+            let obx=document.getElementById("box");
+            console.log(obx.innerHTML);
+        });
+        3：循环数组创建jsx元素（一般都基于数组的map方式完成迭代），需要给创建的元素设置唯一的key值(当前本次循环内唯一即可)
+
+        例子：
+        let data=[{name:"尤荣浪"},{name:"jack you"}];
+        ReactDOM.render(
+            <ul>
+                {data.map((item,index)=>{
+                    return <li key={index}>{item.name}</li>;
+                })}
+            </ul>
+        ,document.getElementById("root")
+        );
+        4:只能出现一个根元素
+        错误写法
+          ReactDOM.render(
+            <ul className="hh"> </ul><div></div>
+        ,document.getElementById("root")
+        );
+        正确写法
+         ReactDOM.render(
+            <div><ul className="hh"> </ul></div>
+        ,document.getElementById("root")
+        );
+        5：给元素设置样式类用的是clasName而不是class
+        ReactDOM.render(
+            <ul className="hh"> </ul>
+        ,document.getElementById("root")
+        );
+        6：style中不能直接写样式字符串，需要基于一个样式对象来遍历赋值
+        例子：
+        let data=[{name:"尤荣浪"},{name:"jack you"}];
+        let classA="kk";
+        ReactDOM.render(
+            <ul style={{color:'red'}} className={classA}>
+                {data.map((item,index)=>{
+                    return <li key={index}>{item.name}</li>;
+                })}
+            </ul>
+        ,document.getElementById("root")
+        );
+
+
+-----------------------------------------------------------------------------------------------------------------
+        第5课：
 
 
