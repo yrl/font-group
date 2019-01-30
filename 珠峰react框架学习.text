@@ -190,7 +190,7 @@ react是一款框架：具备自己开发的独立思想（mvc:model view contro
         第5课：
 
 -----------------------------------------------------------------------------------------------------------------
-        第6课：把jsx
+        第6课：jsx语法的渲染流程
         import ReactDOM, {render} from 'react-dom';//从react-dom中导入一个reactDom，逗号后面的内容是把reactDom这个对
         象进行解构<=>import {render} from "react-dom";
 
@@ -199,4 +199,138 @@ react是一款框架：具备自己开发的独立思想（mvc:model view contro
         var {name}=ob;
         console.log(name);
 
+        /*
+            JSX渲染机制
+            1：基于babel中的语法解析模块（babel-preset-react）把jsx语法编译为react.createElement(...)结构
+             
+             例子：
+            let styleObj={color:'red'};
+            render(<h1 id='titleBox' className='title' style={styleObj}>
+            打击好
+            </h1>,document.getElementById('root'));
+         到下面这个网址进行转换
+           https://babeljs.io/repl#?babili=false&browsers=&build=&builtIns=false&spec=false&loose=false&code_lz=DwCwjABAlgJgvAcgC5SQGwKYCED2APBCAYzQEMBncgOVIFsNEV0NDykBPTOAbzc4wDyAIwBWAXwB8AKEDKRoG_FQL6aU4AHpwEoA&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=es2015%2Creact%2Cstage-2&prettier=false&targets=&version=6.26.0&envVersion=
+           得到下面的结果
+            React.createElement(
+            'h1',
+            { id: 'titleBox', className: 'title', style: styleObj },
+            '\u6253\u51FB\u597D'
+            );
+            2：执行react.createElement(type,props,children),创建一个对象（虚拟dom）
+                let styleObj={color:'red'};
+                React.createElement(
+                    'h1',
+                    { id: 'titleBox', className: 'title', style: styleObj },
+                    '\u6253\u51FB\u597D'
+                );
+                根据打印出来的结果
+                type:'h1'，
+                key:null,
+                props:{
+                    id: "titleBox", 
+                    className: "title", 
+                    style:{color: "red"},
+                    children: "打击好"
+                }
+                ref:null,
+                ......
+                __proto__:Object.prototype
+           3：reactDom.render(JSX语法最后生成的对象，容器)，基于render方法把生成的对象动态创建为dom元素，插入到指定的容器中
+        */
 
+-----------------------------------------------------------------------------------------------------
+        第7课：jsx语法的渲染机制1
+        例子：模拟react的createElement函数
+            <script>
+                let styleObj={color:'red'};
+                function createElement(type,props,children){
+                    let obj={
+                        type:null,
+                        props:{
+                            children:''
+                        },
+                        ref:null,
+                        key:null
+                    }
+                    //=>用传递
+                    //	obj  = {...obj,type,props};
+                    obj = {...obj,type,props:{...props,children}};
+                    'key' in obj.props ? (obj.key = obj.props.key , obj.props.key=undefined) : null;
+                    'ref' in obj.props ? (obj.ref = obj.props.ref , obj.props.ref=undefined) : null;
+                    return obj;
+                }
+            console.log(createElement('h1',{id:"title",className:"title",style:styleObj,ref:'AA',key:"12"},"大家好"));
+            
+            </script>
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            第8课：jsx语法的渲染机制2
+            模拟react案例
+
+            <div id="aa"></div>
+                <script>
+                    let styleObj={color:'red'};
+                    function createElement(type,props,children){
+                        let obj={
+                            type:null,
+                            props:{
+                                children:''
+                            },
+                            ref:null,
+                            key:null
+                        }
+                        //=>用传递
+                        //	obj  = {...obj,type,props};
+                        obj = {...obj,type,props:{...props,children}};
+                        'key' in obj.props ? (obj.key = obj.props.key , obj.props.key=undefined) : null;
+                        'ref' in obj.props ? (obj.ref = obj.props.ref , obj.props.ref=undefined) : null;
+                        return obj;
+                    }
+                    
+                    function render(obj,container,callBack){
+                        let {type,props}= obj ||{},
+                        newElement = document.createElement(type);
+                        for(let attr in props){
+                            if (!props.hasOwnProperty(attr)) break;
+                            if(!props[attr]) continue;
+                            let value = props[attr];
+                            //=>CLASS-NAME
+                            if (attr === "className"){
+                                newElement.setAttribute("class",value);
+                                continue;
+                            }
+                            //=>STYLE
+                            if (attr === "style"){
+                                if (value === '') continue;
+                                for (let styKey in value){
+                                    if(value.hasOwnProperty(styKey)){
+                                        newElement['style'][styKey] = value[styKey];
+                                    }
+                                }
+                                continue;
+                            }
+                            //=>children
+                            if (attr === "children"){
+                                if (typeof value === "string"){
+                                    let text =  document.createTextNode(value);
+                                    newElement.appendChild(text);
+                                }
+                                continue;
+                            }
+                            newElement.setAttribute(attr,value);//=>基于set-Attribute可以让设置的属性表现在html结构上
+                        }
+                        container.appendChild(newElement);
+                        callBack && callBack();
+                    }
+                let objJSX=createElement('h1',{id:"title",className:"title",style:styleObj,ref:'AA',key:"12"},"大家好");
+                let  root= document.getElementById("aa");
+                render(objJSX,root,()=>{
+                    console.log('ok');
+                })
+                </script>
+
+        --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            第9课：JSX语法的渲染机制（复杂结构的JSX的处理）
+        
+        --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            第10课：函数式组件的基础语法
+            
