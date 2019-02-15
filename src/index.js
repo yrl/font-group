@@ -1,51 +1,38 @@
 import React from 'react';
 import ReactDOM, {render} from 'react-dom';//从react-dom中导入一个reactDom，逗号后面的内容是把reactDom这个对象进行解构<=>import {render} from "react-dom";
 
-
+import Dialog from './component/fun';
 import './index.css';
+import App from './App';
 import * as serviceWorker from './serviceWorker';
 import Item from 'antd/lib/list/Item';
 
-function sum(props){
-  console.log(this);
-  return <div>
-    函数式声明
-  </div>;
-}
-
-class Dialog extends React.Component{
-  constructor(props,context,updater){
-     super(); //=>ES6中的extends继承，一但使用了constructor，第一行位置必须设置super执行；相当于react.component.call(this),也
-    //  就是call继承，把父类私有的属性继承过来
-
-    /*
-      =>PROPS:当render渲染并且把当前类执行创建实例的时候，会把之前jsx解析出来的
-      props对象中的信息（可能有children）传递给参数 props=》 “调用组件传递的属性”
-    */
-    /*
-    this.props: 属性集合
-    this.refs:ref 集合（非受控组件中用到）
-    this.context:上下文
-     */
-    console.log(this);
-    
-    
-  }
-  render(){
-      return <section>
-        <h3>系统提示</h3>
-        <div></div>
-      </section>
-  }
-}
-
 ReactDOM.render(<div>
-  珠峰培训
-  <Dialog lx={2} con="哈哈哈">
-    <span>我是子元素</span>
-  </Dialog>
-</div>,document.getElementById('root'))
+  {/*注释：jsx中调用组件，只需要把组件当做一个标签去使用即可（单闭合和双闭合都可以） */}
+  <Dialog />
+  <Dialog con='哈哈哈😄' lx={2}>
+  {/* 属性值不是字符串，我们需要使用大括号包起来 */}
 
+    <span>我的天呀cnpm</span>
+    
+  </Dialog>
+</div>, document.getElementById('root'));
+
+/*1:react组件
+不管是vue还是react框架，设计之初都是期望我们按照"组件/模块管理"的方式来构架程序,也就是把一个程序划分为
+一个个的组件单独处理
+[优势]
+1.有助于多人协作开发
+2.我们开发的组件可以被复用
+....
+
+  react中创建组件有两种方式：
+  函数声明组件
+  基于继承component类来创建组件
+
+  src->compneent：这个文件夹中存放的就是开发的组件
+
+*/
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
